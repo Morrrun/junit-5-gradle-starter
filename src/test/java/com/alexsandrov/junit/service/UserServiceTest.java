@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -27,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * TestInstance.Lifecycle.PER_METHOD - создает новый экземпляр для каждого тестового метода
  * TestInstance.Lifecycle.PER_CLASS - создает один экземпляр для всех тестовых методов
  */
+@Tag("fast")
+@Tag("user")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserServiceTest {
     private static final User IVAN = new User(1, "Ivan", "123");
@@ -67,6 +70,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
     void throwExceptionIfUsernameOrPasswordIsNull() {
         assertAll(
                 () -> assertThrows(IllegalArgumentException.class,
@@ -79,7 +83,8 @@ public class UserServiceTest {
     }
 
     @Test
-    void logicFailIfUserDontNotExist() {
+    @Tag("login")
+    void loginFailIfUserDontNotExist() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login("dummy", IVAN.password());
 
@@ -87,7 +92,8 @@ public class UserServiceTest {
     }
 
     @Test
-    void logicFailIfPasswordNonCorrect() {
+    @Tag("login")
+    void loginFailIfPasswordNonCorrect() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login(IVAN.username(), "dummy");
 
@@ -95,6 +101,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @Tag("login")
     void loginSuccessIfUserExists() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login(IVAN.username(), IVAN.password());
