@@ -1,7 +1,10 @@
 package com.alexsandrov.junit.service;
 
+
 import org.example.service.UserService;
 import org.example.dto.User;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.collection.IsMapContaining;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,14 +13,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 
+import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Показывает ЖЦ Unit-теста
- * @BeforeAll -> @BeforeEach -> @Test -> @AfterEach -> @AfterAll
  *
+ * @BeforeAll -> @BeforeEach -> @Test -> @AfterEach -> @AfterAll
  * @TestInstance - определяет стратегию для создания объекта класса
  * TestInstance.Lifecycle.PER_METHOD - создает новый экземпляр для каждого тестового метода
  * TestInstance.Lifecycle.PER_CLASS - создает один экземпляр для всех тестовых методов
@@ -39,6 +44,28 @@ public class UserServiceTest {
         userService = new UserService();
     }
 
+
+    @Test
+    void usersConvertedToMapById() {
+        userService.add(IVAN, PETR);
+
+        Map<Integer, User> users = userService.getAllConvertedById();
+//      Library Hamcrest
+        assertAll(
+                () -> MatcherAssert.assertThat(users, IsMapContaining.hasKey(IVAN.id())),
+                () -> MatcherAssert.assertThat(users, IsMapContaining.hasKey(PETR.id())),
+                () -> MatcherAssert.assertThat(users, IsMapContaining.hasValue(PETR)),
+                () -> MatcherAssert.assertThat(users, IsMapContaining.hasValue(IVAN))
+        );
+
+//        Library AsserJ
+//        assertAll(
+//                () -> assertThat(users).containsKeys(IVAN.id(), PETR.id()),
+//                () -> assertThat(users).containsValues(IVAN, PETR)
+//        );
+
+    }
+
     @Test
     void logicFailIfUserDontNotExist() {
         userService.add(IVAN);
@@ -46,6 +73,7 @@ public class UserServiceTest {
 
         assertTrue(maybeUser.isEmpty());
     }
+
     @Test
     void logicFailIfPasswordNonCorrect() {
         userService.add(IVAN);
@@ -53,15 +81,18 @@ public class UserServiceTest {
 
         assertTrue(maybeUser.isEmpty());
     }
+
     @Test
-    void logicSuccessIfUserExists() {
+    void loginSuccessIfUserExists() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login(IVAN.username(), IVAN.password());
 
-        assertTrue(maybeUser.isPresent());
-
-        User user = maybeUser.get();
-        assertEquals(IVAN, user);
+        assertThat(maybeUser).isPresent();
+        maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
+//        DEFAULT
+//        assertTrue(maybeUser.isPresent());
+//        User user = maybeUser.get();
+//        assertEquals(IVAN, user);
 
     }
 
@@ -73,6 +104,7 @@ public class UserServiceTest {
 
         assertTrue(users.isEmpty(), "User list should be empty");
     }
+
     @Test
     void UsersSizeIfUserAdded() {
         System.out.println("Test 2: " + this);
@@ -82,7 +114,9 @@ public class UserServiceTest {
 
         var users = userService.getAll();
 
-        assertEquals(2, users.size());
+        assertThat(users).hasSize(2);
+//        DEFAULT
+//        assertEquals(2, users.size());
     }
 
     @AfterEach
