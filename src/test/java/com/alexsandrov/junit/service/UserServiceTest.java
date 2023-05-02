@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -22,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserServiceTest {
+    private static final User IVAN = new User(1, "Ivan", "123");
+    private static final User PETR = new User(2, "Petr", "111");
     private UserService userService;
 
     @BeforeAll
@@ -36,19 +40,45 @@ public class UserServiceTest {
     }
 
     @Test
+    void logicFailIfUserDontNotExist() {
+        userService.add(IVAN);
+        Optional<User> maybeUser = userService.login("dummy", IVAN.password());
+
+        assertTrue(maybeUser.isEmpty());
+    }
+    @Test
+    void logicFailIfPasswordNonCorrect() {
+        userService.add(IVAN);
+        Optional<User> maybeUser = userService.login(IVAN.username(), "dummy");
+
+        assertTrue(maybeUser.isEmpty());
+    }
+    @Test
+    void logicSuccessIfUserExists() {
+        userService.add(IVAN);
+        Optional<User> maybeUser = userService.login(IVAN.username(), IVAN.password());
+
+        assertTrue(maybeUser.isPresent());
+
+        User user = maybeUser.get();
+        assertEquals(IVAN, user);
+
+    }
+
+    @Test
     void usersEmptyIfNoUserAdded() {
         System.out.println("Test 1: " + this);
 
         var users = userService.getAll();
 
-        assertTrue(users.isEmpty(), () -> "User list should be empty");
+        assertTrue(users.isEmpty(), "User list should be empty");
     }
     @Test
     void UsersSizeIfUserAdded() {
         System.out.println("Test 2: " + this);
 
-        userService.add(new User());
-        userService.add(new User());
+        userService.add(IVAN);
+        userService.add(PETR);
 
         var users = userService.getAll();
 
