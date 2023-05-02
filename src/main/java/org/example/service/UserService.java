@@ -1,9 +1,8 @@
-package com.alexsandrov;
+package org.example.service;
 
-import com.alexsandrov.dto.User;
+import org.example.dto.User;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class UserService {

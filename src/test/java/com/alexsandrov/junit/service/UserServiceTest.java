@@ -1,7 +1,7 @@
 package com.alexsandrov.junit.service;
 
-import com.alexsandrov.UserService;
-import com.alexsandrov.dto.User;
+import org.example.service.UserService;
+import org.example.dto.User;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
