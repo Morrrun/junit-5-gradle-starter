@@ -1,4 +1,9 @@
 package org.example.dto;
 
-public class User {
+
+public record User(Integer id, 
+        String username, 
+        String password) {
+     
+     
 }
