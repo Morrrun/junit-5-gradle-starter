@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Показывает ЖЦ Unit-теста
- * @BeforeAll -> @BeforeEach -> @Test -> @AfterEach -> @AfterAll
  *
+ * @BeforeAll -> @BeforeEach -> @Test -> @AfterEach -> @AfterAll
  * @TestInstance - определяет стратегию для создания объекта класса
  * TestInstance.Lifecycle.PER_METHOD - создает новый экземпляр для каждого тестового метода
  * TestInstance.Lifecycle.PER_CLASS - создает один экземпляр для всех тестовых методов
@@ -40,12 +40,25 @@ public class UserServiceTest {
     }
 
     @Test
+    void throwExceptionIfUsernameOrPasswordIsNull() {
+        assertAll(
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> userService.login(null, "dummy")),
+
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> userService.login("dummy", null))
+        );
+
+    }
+
+    @Test
     void logicFailIfUserDontNotExist() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login("dummy", IVAN.password());
 
         assertTrue(maybeUser.isEmpty());
     }
+
     @Test
     void logicFailIfPasswordNonCorrect() {
         userService.add(IVAN);
@@ -53,6 +66,7 @@ public class UserServiceTest {
 
         assertTrue(maybeUser.isEmpty());
     }
+
     @Test
     void logicSuccessIfUserExists() {
         userService.add(IVAN);
@@ -73,6 +87,7 @@ public class UserServiceTest {
 
         assertTrue(users.isEmpty(), "User list should be empty");
     }
+
     @Test
     void UsersSizeIfUserAdded() {
         System.out.println("Test 2: " + this);
