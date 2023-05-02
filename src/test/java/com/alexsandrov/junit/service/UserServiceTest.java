@@ -67,6 +67,18 @@ public class UserServiceTest {
     }
 
     @Test
+    void throwExceptionIfUsernameOrPasswordIsNull() {
+        assertAll(
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> userService.login(null, "dummy")),
+
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> userService.login("dummy", null))
+        );
+
+    }
+
+    @Test
     void logicFailIfUserDontNotExist() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login("dummy", IVAN.password());
