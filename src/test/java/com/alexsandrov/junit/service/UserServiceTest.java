@@ -14,10 +14,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +29,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
 
 /**
  * Показывает ЖЦ Unit-теста
@@ -41,15 +45,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 @ExtendWith({
         UserServiceParamResolver.class,
+        MockitoExtension.class
 //        GlobalExtension.class
 })
 public class UserServiceTest extends TestBase {
 
     private static final User IVAN = new User(1, "Ivan", "123");
     private static final User PETR = new User(2, "Petr", "111");
-//    @ForPresentation
-    private UserService userService;
+
+    @Captor
+    private ArgumentCaptor<Integer> argumentCaptor;
+    @Mock
     private UserDao userDao;
+    @InjectMocks
+    private UserService userService;
 
 
     @BeforeAll
@@ -61,10 +70,14 @@ public class UserServiceTest extends TestBase {
     @BeforeEach
     void prepare() {
         System.out.println("Before each: " + this);
+
         System.out.println();
-//        this.userDao = Mockito.mock(UserDao.class);
-        this.userDao = Mockito.spy(UserDao.class);
-        this.userService = new UserService(userDao);
+    }
+
+    @Test
+    void throwExceptionIfDatabaseIsNotAvailable() {
+        doThrow(RuntimeException.class).when(userDao).delete(IVAN.id());
+        assertThrows(RuntimeException.class, () -> userDao.delete(IVAN.id()));
     }
 
     @Test
@@ -96,9 +109,8 @@ public class UserServiceTest extends TestBase {
         System.out.println(userDao.delete(IVAN.id()));
 
 //        Mockito.verify(userDao, Mockito.atLeast(3)).delete(IVAN.id());
-        var integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-        Mockito.verify(userDao, Mockito.times(3)).delete(integerArgumentCaptor.capture());
-        assertThat(integerArgumentCaptor.getValue()).isEqualTo(1);
+        Mockito.verify(userDao, Mockito.times(3)).delete(argumentCaptor.capture());
+        assertThat(argumentCaptor.getValue()).isEqualTo(IVAN.id());
 
         assertThat(deleteResult).isTrue();
     }
@@ -218,7 +230,6 @@ public class UserServiceTest extends TestBase {
     void deleteDataFromDatabase() {
         System.out.println("AfterEach: " + this);
         System.out.println();
-        userService.clear();
     }
 
     @AfterAll
