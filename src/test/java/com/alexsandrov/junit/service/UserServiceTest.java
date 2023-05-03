@@ -2,7 +2,9 @@ package com.alexsandrov.junit.service;
 
 
 import com.alexsandrov.junit.TestBase;
+import com.alexsandrov.junit.extension.PostProcessingExtension;
 import com.alexsandrov.junit.paramresolver.UserServiceParamResolver;
+import org.example.annotation.ForPresentation;
 import org.example.service.UserService;
 import org.example.dto.User;
 import org.hamcrest.MatcherAssert;
@@ -37,12 +39,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 @ExtendWith({
         UserServiceParamResolver.class,
+        PostProcessingExtension.class
 //        GlobalExtension.class
 })
 public class UserServiceTest extends TestBase {
 
     private static final User IVAN = new User(1, "Ivan", "123");
     private static final User PETR = new User(2, "Petr", "111");
+    @ForPresentation
     private UserService userService;
 
     @BeforeAll
@@ -55,7 +59,6 @@ public class UserServiceTest extends TestBase {
     void prepare(UserService userService) {
         System.out.println("Before each: " + this);
         System.out.println();
-        this.userService = userService;
     }
 
 
