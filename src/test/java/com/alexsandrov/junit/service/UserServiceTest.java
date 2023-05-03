@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -84,6 +85,9 @@ public class UserServiceTest extends TestBase {
     @Test
     void usersEmptyIfNoUserAdded() {
         System.out.println("Test 1: " + this);
+        if(true) {
+            throw new RuntimeException();
+        }
 
         var users = userService.getAll();
 
@@ -91,9 +95,11 @@ public class UserServiceTest extends TestBase {
     }
 
     @Test
-    void UsersSizeIfUserAdded() {
+    void UsersSizeIfUserAdded() throws IOException {
         System.out.println("Test 2: " + this);
-
+        if(true) {
+            throw new IOException();
+        }
         userService.add(IVAN);
         userService.add(PETR);
 
