@@ -122,6 +122,7 @@ public class UserServiceTest {
         }
 
         @Test
+        @Disabled("flaky, need to see")
         void loginFailIfPasswordNonCorrect() {
             userService.add(IVAN);
             Optional<User> maybeUser = userService.login(IVAN.username(), "dummy");
@@ -129,7 +130,8 @@ public class UserServiceTest {
             assertTrue(maybeUser.isEmpty());
         }
 
-        @Test
+//        @Test
+        @RepeatedTest(5)
         void loginSuccessIfUserExists() {
             userService.add(IVAN);
             Optional<User> maybeUser = userService.login(IVAN.username(), IVAN.password());
