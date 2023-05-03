@@ -3,7 +3,7 @@ package com.alexsandrov.junit.service;
 
 import com.alexsandrov.junit.TestBase;
 import com.alexsandrov.junit.extension.PostProcessingExtension;
-import com.alexsandrov.junit.paramresolver.UserServiceParamResolver;
+import com.alexsandrov.junit.extension.paramresolver.UserServiceParamResolver;
 import org.example.annotation.ForPresentation;
 import org.example.service.UserService;
 import org.example.dto.User;
@@ -207,6 +207,7 @@ public class UserServiceTest extends TestBase {
     void deleteDataFromDatabase() {
         System.out.println("AfterEach: " + this);
         System.out.println();
+        userService.clear();
     }
 
     @AfterAll

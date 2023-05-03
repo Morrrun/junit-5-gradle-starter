@@ -36,4 +36,8 @@ public class UserService {
     public Map<Integer, User> getAllConvertedById() {
         return users.stream().collect(Collectors.toMap(User::id, identity()));
     }
+
+    public void clear() {
+        users.clear();
+    }
 }
