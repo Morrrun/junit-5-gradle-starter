@@ -1,6 +1,7 @@
 package com.alexsandrov.junit.service;
 
 
+import com.alexsandrov.junit.TestBase;
 import com.alexsandrov.junit.paramresolver.UserServiceParamResolver;
 import org.example.service.UserService;
 import org.example.dto.User;
@@ -35,9 +36,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 @ExtendWith({
-        UserServiceParamResolver.class
+        UserServiceParamResolver.class,
+//        GlobalExtension.class
 })
-public class UserServiceTest {
+public class UserServiceTest extends TestBase {
 
     private static final User IVAN = new User(1, "Ivan", "123");
     private static final User PETR = new User(2, "Petr", "111");
@@ -46,11 +48,13 @@ public class UserServiceTest {
     @BeforeAll
     void init() {
         System.out.println("BeforeAll each: " + this);
+        System.out.println();
     }
 
     @BeforeEach
     void prepare(UserService userService) {
         System.out.println("Before each: " + this);
+        System.out.println();
         this.userService = userService;
     }
 
@@ -199,11 +203,13 @@ public class UserServiceTest {
     @AfterEach
     void deleteDataFromDatabase() {
         System.out.println("AfterEach: " + this);
+        System.out.println();
     }
 
     @AfterAll
     void closeConnectionPool() {
         System.out.println("AfterAll each: " + this);
+        System.out.println();
     }
 
 }
