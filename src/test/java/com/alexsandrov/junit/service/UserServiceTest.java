@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 
@@ -61,35 +62,43 @@ public class UserServiceTest extends TestBase {
     void prepare() {
         System.out.println("Before each: " + this);
         System.out.println();
-        this.userDao = Mockito.mock(UserDao.class);
+//        this.userDao = Mockito.mock(UserDao.class);
+        this.userDao = Mockito.spy(UserDao.class);
         this.userService = new UserService(userDao);
     }
 
     @Test
     void shouldDeleteExistedUser() {
         userService.add(IVAN);
-        /**
-         * Это объект Stub, который используется mocks
-         * и spies для ответа
-         * на вызовы методов во время тестов
+        /*
+          Это объект Stub, который используется mocks
+          и spies для ответа
+          на вызовы методов во время тестов
          */
-//        Mockito.doReturn(true).when(userDao).delete(IVAN.id());
-        /**
-         * Это объект Dummy, который не используется,
-         * нужен только для заполнения
-         * параметров метода
+        Mockito.doReturn(true).when(userDao).delete(IVAN.id());
+        /*
+          Это объект Dummy, который не используется,
+          нужен только для заполнения
+          параметров метода
          */
 //        Mockito.doReturn(true).when(userDao).delete(Mockito.anyInt());
 
-
-        Mockito.when(userDao.delete(IVAN.id()))
-                .thenReturn(true)
-                .thenReturn(false);
+        /*
+          Для объектов Spy может не подойти
+         */
+//        Mockito.when(userDao.delete(IVAN.id()))
+//                .thenReturn(true)
+//                .thenReturn(false);
 
         var deleteResult = userService.delete(IVAN.id());
         System.out.println(deleteResult);
         System.out.println(userDao.delete(IVAN.id()));
         System.out.println(userDao.delete(IVAN.id()));
+
+//        Mockito.verify(userDao, Mockito.atLeast(3)).delete(IVAN.id());
+        var integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+        Mockito.verify(userDao, Mockito.times(3)).delete(integerArgumentCaptor.capture());
+        assertThat(integerArgumentCaptor.getValue()).isEqualTo(1);
 
         assertThat(deleteResult).isTrue();
     }
@@ -118,7 +127,7 @@ public class UserServiceTest extends TestBase {
     }
 
     @Test
-    void UsersSizeIfUserAdded() throws IOException {
+    void UsersSizeIfUserAdded() {
         System.out.println("Test 2: " + this);
         userService.add(IVAN);
         userService.add(PETR);

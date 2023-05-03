@@ -7,13 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Работа Mock
+ * Работа Spy
  */
-public class UserDaoMock extends UserDao {
+public class UserDaoSpy extends UserDao {
+    private UserDao userDao;
     private Map<Integer, Boolean> answers = new HashMap<>();
     private Answer1<Integer, Boolean> answer1;
     @Override
     public boolean delete(Integer userId) {
-        return answers.getOrDefault(userId, false);
+        return answers.getOrDefault(userId, userDao.delete(userId));
     }
 }
