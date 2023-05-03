@@ -1,7 +1,9 @@
 package com.alexsandrov.junit.service;
 
 
-import com.alexsandrov.junit.paramresolver.UserServiceParamResolver;
+import com.alexsandrov.junit.TestBase;
+import com.alexsandrov.junit.extension.paramresolver.UserServiceParamResolver;
+import org.example.annotation.ForPresentation;
 import org.example.service.UserService;
 import org.example.dto.User;
 import org.hamcrest.MatcherAssert;
@@ -13,6 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -35,23 +38,26 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 @ExtendWith({
-        UserServiceParamResolver.class
+        UserServiceParamResolver.class,
+//        GlobalExtension.class
 })
-public class UserServiceTest {
+public class UserServiceTest extends TestBase {
 
     private static final User IVAN = new User(1, "Ivan", "123");
     private static final User PETR = new User(2, "Petr", "111");
+    @ForPresentation
     private UserService userService;
 
     @BeforeAll
     void init() {
         System.out.println("BeforeAll each: " + this);
+        System.out.println();
     }
 
     @BeforeEach
     void prepare(UserService userService) {
         System.out.println("Before each: " + this);
-        this.userService = userService;
+        System.out.println();
     }
 
 
@@ -79,6 +85,9 @@ public class UserServiceTest {
     @Test
     void usersEmptyIfNoUserAdded() {
         System.out.println("Test 1: " + this);
+        if(true) {
+            throw new RuntimeException();
+        }
 
         var users = userService.getAll();
 
@@ -86,9 +95,11 @@ public class UserServiceTest {
     }
 
     @Test
-    void UsersSizeIfUserAdded() {
+    void UsersSizeIfUserAdded() throws IOException {
         System.out.println("Test 2: " + this);
-
+        if(true) {
+            throw new IOException();
+        }
         userService.add(IVAN);
         userService.add(PETR);
 
@@ -199,11 +210,14 @@ public class UserServiceTest {
     @AfterEach
     void deleteDataFromDatabase() {
         System.out.println("AfterEach: " + this);
+        System.out.println();
+        userService.clear();
     }
 
     @AfterAll
     void closeConnectionPool() {
         System.out.println("AfterAll each: " + this);
+        System.out.println();
     }
 
 }
