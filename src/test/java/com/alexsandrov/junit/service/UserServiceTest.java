@@ -8,10 +8,14 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
         UserServiceParamResolver.class
 })
 public class UserServiceTest {
+
     private static final User IVAN = new User(1, "Ivan", "123");
     private static final User PETR = new User(2, "Petr", "111");
     private UserService userService;
@@ -68,6 +73,7 @@ public class UserServiceTest {
 //        );
 
     }
+
     @Test
     void usersEmptyIfNoUserAdded() {
         System.out.println("Test 1: " + this);
@@ -106,6 +112,7 @@ public class UserServiceTest {
             );
 
         }
+
         @Test
         void loginFailIfUserDontNotExist() {
             userService.add(IVAN);
@@ -135,6 +142,43 @@ public class UserServiceTest {
 //        assertEquals(IVAN, user);
 
         }
+
+        @ParameterizedTest(name = "{arguments} test")
+        @MethodSource("com.alexsandrov.junit.service.UserServiceTest#getArgumentsForLoginTest")
+        @DisplayName("login parametrize test")
+//    @ArgumentsSource()
+//    @NullAndEmptySource
+//    @NullSource
+//    @EmptySource
+//    @ValueSource(strings = {
+//            "Ivan", "Petr"
+//    })
+//    @EnumSource
+//        @CsvFileSource(
+//                resources = "/login-test-date.csv",
+//                numLinesToSkip = 1
+//        )
+//        @CsvSource({
+//                "Ivan, 123",
+//                "Petr, 111"
+//        })
+        void loginParametrizedTest(String username, String password, Optional<User> user) {
+            userService.add(IVAN, PETR);
+
+            Optional<User> maybeUser = userService.login(username, password);
+            assertThat(maybeUser).isEqualTo(user);
+
+        }
+
+    }
+
+    static Stream<Arguments> getArgumentsForLoginTest() {
+        return Stream.of(
+                Arguments.of("Ivan", "123", Optional.of(IVAN)),
+                Arguments.of("Petr", "111", Optional.of(PETR)),
+                Arguments.of("Petr", "dummy", Optional.empty()),
+                Arguments.of("dummy", "111", Optional.empty())
+        );
     }
 
     @AfterEach
@@ -146,4 +190,5 @@ public class UserServiceTest {
     void closeConnectionPool() {
         System.out.println("AfterAll each: " + this);
     }
+
 }
