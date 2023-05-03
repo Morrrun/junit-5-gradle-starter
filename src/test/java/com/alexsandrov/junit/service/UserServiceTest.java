@@ -46,7 +46,6 @@ import static org.mockito.Mockito.doThrow;
 @ExtendWith({
         UserServiceParamResolver.class,
         MockitoExtension.class
-//        GlobalExtension.class
 })
 public class UserServiceTest extends TestBase {
 
@@ -83,32 +82,14 @@ public class UserServiceTest extends TestBase {
     @Test
     void shouldDeleteExistedUser() {
         userService.add(IVAN);
-        /*
-          Это объект Stub, который используется mocks
-          и spies для ответа
-          на вызовы методов во время тестов
-         */
-        Mockito.doReturn(true).when(userDao).delete(IVAN.id());
-        /*
-          Это объект Dummy, который не используется,
-          нужен только для заполнения
-          параметров метода
-         */
-//        Mockito.doReturn(true).when(userDao).delete(Mockito.anyInt());
 
-        /*
-          Для объектов Spy может не подойти
-         */
-//        Mockito.when(userDao.delete(IVAN.id()))
-//                .thenReturn(true)
-//                .thenReturn(false);
+        Mockito.doReturn(true).when(userDao).delete(IVAN.id());
 
         var deleteResult = userService.delete(IVAN.id());
         System.out.println(deleteResult);
         System.out.println(userDao.delete(IVAN.id()));
         System.out.println(userDao.delete(IVAN.id()));
 
-//        Mockito.verify(userDao, Mockito.atLeast(3)).delete(IVAN.id());
         Mockito.verify(userDao, Mockito.times(3)).delete(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue()).isEqualTo(IVAN.id());
 
