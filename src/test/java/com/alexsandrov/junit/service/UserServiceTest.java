@@ -1,11 +1,13 @@
 package com.alexsandrov.junit.service;
 
 
+import com.alexsandrov.junit.paramresolver.UserServiceParamResolver;
 import org.example.service.UserService;
 import org.example.dto.User;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 
 import java.util.Map;
@@ -26,6 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("user")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+@ExtendWith({
+        UserServiceParamResolver.class
+})
 public class UserServiceTest {
     private static final User IVAN = new User(1, "Ivan", "123");
     private static final User PETR = new User(2, "Petr", "111");
@@ -37,9 +42,9 @@ public class UserServiceTest {
     }
 
     @BeforeEach
-    void prepare() {
+    void prepare(UserService userService) {
         System.out.println("Before each: " + this);
-        userService = new UserService();
+        this.userService = userService;
     }
 
 
