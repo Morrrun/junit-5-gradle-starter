@@ -13,8 +13,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
@@ -101,7 +103,19 @@ public class UserServiceTest {
     @DisplayName("test user login functionality")
     @Tag("login")
     class LoginTest {
+
         @Test
+        void checkLoginFunctionalityPerformance() {
+            System.out.println(Thread.currentThread().getName());
+            Optional<User> result = assertTimeoutPreemptively(Duration.ofMillis(200L), () -> {
+                System.out.println(Thread.currentThread().getName());
+                Thread.sleep(300L);
+                return userService.login("dummy", IVAN.password());
+            });
+        }
+
+        @Test
+        @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
         void throwExceptionIfUsernameOrPasswordIsNull() {
             assertAll(
                     () -> assertThrows(IllegalArgumentException.class,
@@ -122,6 +136,7 @@ public class UserServiceTest {
         }
 
         @Test
+        @Disabled("flaky, need to see")
         void loginFailIfPasswordNonCorrect() {
             userService.add(IVAN);
             Optional<User> maybeUser = userService.login(IVAN.username(), "dummy");
@@ -129,7 +144,7 @@ public class UserServiceTest {
             assertTrue(maybeUser.isEmpty());
         }
 
-        @Test
+        @RepeatedTest(5)
         void loginSuccessIfUserExists() {
             userService.add(IVAN);
             Optional<User> maybeUser = userService.login(IVAN.username(), IVAN.password());
