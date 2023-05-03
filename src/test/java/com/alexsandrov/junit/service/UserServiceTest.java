@@ -2,7 +2,6 @@ package com.alexsandrov.junit.service;
 
 
 import com.alexsandrov.junit.TestBase;
-import com.alexsandrov.junit.extension.PostProcessingExtension;
 import com.alexsandrov.junit.extension.paramresolver.UserServiceParamResolver;
 import org.example.annotation.ForPresentation;
 import org.example.service.UserService;
@@ -39,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 @ExtendWith({
         UserServiceParamResolver.class,
-        PostProcessingExtension.class
 //        GlobalExtension.class
 })
 public class UserServiceTest extends TestBase {
