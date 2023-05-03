@@ -3,7 +3,7 @@ package com.alexsandrov.junit.service;
 
 import com.alexsandrov.junit.TestBase;
 import com.alexsandrov.junit.extension.paramresolver.UserServiceParamResolver;
-import org.example.annotation.ForPresentation;
+import org.example.dao.UserDao;
 import org.example.service.UserService;
 import org.example.dto.User;
 import org.hamcrest.MatcherAssert;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 
 
 import java.io.IOException;
@@ -45,8 +46,10 @@ public class UserServiceTest extends TestBase {
 
     private static final User IVAN = new User(1, "Ivan", "123");
     private static final User PETR = new User(2, "Petr", "111");
-    @ForPresentation
+//    @ForPresentation
     private UserService userService;
+    private UserDao userDao;
+
 
     @BeforeAll
     void init() {
@@ -55,9 +58,40 @@ public class UserServiceTest extends TestBase {
     }
 
     @BeforeEach
-    void prepare(UserService userService) {
+    void prepare() {
         System.out.println("Before each: " + this);
         System.out.println();
+        this.userDao = Mockito.mock(UserDao.class);
+        this.userService = new UserService(userDao);
+    }
+
+    @Test
+    void shouldDeleteExistedUser() {
+        userService.add(IVAN);
+        /**
+         * Это объект Stub, который используется mocks
+         * и spies для ответа
+         * на вызовы методов во время тестов
+         */
+//        Mockito.doReturn(true).when(userDao).delete(IVAN.id());
+        /**
+         * Это объект Dummy, который не используется,
+         * нужен только для заполнения
+         * параметров метода
+         */
+//        Mockito.doReturn(true).when(userDao).delete(Mockito.anyInt());
+
+
+        Mockito.when(userDao.delete(IVAN.id()))
+                .thenReturn(true)
+                .thenReturn(false);
+
+        var deleteResult = userService.delete(IVAN.id());
+        System.out.println(deleteResult);
+        System.out.println(userDao.delete(IVAN.id()));
+        System.out.println(userDao.delete(IVAN.id()));
+
+        assertThat(deleteResult).isTrue();
     }
 
 
@@ -66,28 +100,17 @@ public class UserServiceTest extends TestBase {
         userService.add(IVAN, PETR);
 
         Map<Integer, User> users = userService.getAllConvertedById();
-//      Library Hamcrest
         assertAll(
                 () -> MatcherAssert.assertThat(users, IsMapContaining.hasKey(IVAN.id())),
                 () -> MatcherAssert.assertThat(users, IsMapContaining.hasKey(PETR.id())),
                 () -> MatcherAssert.assertThat(users, IsMapContaining.hasValue(PETR)),
                 () -> MatcherAssert.assertThat(users, IsMapContaining.hasValue(IVAN))
         );
-
-//        Library AsserJ
-//        assertAll(
-//                () -> assertThat(users).containsKeys(IVAN.id(), PETR.id()),
-//                () -> assertThat(users).containsValues(IVAN, PETR)
-//        );
-
     }
 
     @Test
     void usersEmptyIfNoUserAdded() {
         System.out.println("Test 1: " + this);
-        if(true) {
-            throw new RuntimeException();
-        }
 
         var users = userService.getAll();
 
@@ -97,17 +120,12 @@ public class UserServiceTest extends TestBase {
     @Test
     void UsersSizeIfUserAdded() throws IOException {
         System.out.println("Test 2: " + this);
-        if(true) {
-            throw new IOException();
-        }
         userService.add(IVAN);
         userService.add(PETR);
 
         var users = userService.getAll();
 
         assertThat(users).hasSize(2);
-//        DEFAULT
-//        assertEquals(2, users.size());
     }
 
     @Nested
@@ -162,32 +180,12 @@ public class UserServiceTest extends TestBase {
 
             assertThat(maybeUser).isPresent();
             maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
-//        DEFAULT
-//        assertTrue(maybeUser.isPresent());
-//        User user = maybeUser.get();
-//        assertEquals(IVAN, user);
 
         }
 
         @ParameterizedTest(name = "{arguments} test")
         @MethodSource("com.alexsandrov.junit.service.UserServiceTest#getArgumentsForLoginTest")
         @DisplayName("login parametrize test")
-//    @ArgumentsSource()
-//    @NullAndEmptySource
-//    @NullSource
-//    @EmptySource
-//    @ValueSource(strings = {
-//            "Ivan", "Petr"
-//    })
-//    @EnumSource
-//        @CsvFileSource(
-//                resources = "/login-test-date.csv",
-//                numLinesToSkip = 1
-//        )
-//        @CsvSource({
-//                "Ivan, 123",
-//                "Petr, 111"
-//        })
         void loginParametrizedTest(String username, String password, Optional<User> user) {
             userService.add(IVAN, PETR);
 

@@ -15,7 +15,7 @@ public class PostProcessingExtension implements TestInstancePostProcessor {
         for (Field declaredField : declaredFields) {
             if (declaredField.isAnnotationPresent(ForPresentation.class)) {
                 declaredField.setAccessible(true);
-                declaredField.set(testInstance, new UserService());
+                declaredField.set(testInstance, new UserService(null));
             }
         }
     }
